@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreClientRequest;
-use App\Http\Requests\UpdateClientRequest;
+use App\Http\Requests\Api\Client\StoreClientRequest;
+use App\Http\Requests\Api\Client\UpdateClientRequest;
 use App\Models\Client;
-use App\Services\ClientService;
+use App\Services\Client\ClientService;
 
 class ClientController extends Controller
 {

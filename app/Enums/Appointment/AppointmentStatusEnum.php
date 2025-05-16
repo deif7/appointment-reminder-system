@@ -8,4 +8,13 @@ enum AppointmentStatusEnum: string
     case Completed = 'completed';
     case Canceled = 'canceled';
     case Missed = 'missed';
+
+    public static function notScheduled(): array
+    {
+        return [
+            self::Completed,
+            self::Canceled,
+            self::Missed,
+        ];
+    }
 }

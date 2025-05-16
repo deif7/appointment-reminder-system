@@ -10,6 +10,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
 use Throwable;
 
+
 class Handler extends ExceptionHandler
 {
     /**
@@ -43,7 +44,8 @@ class Handler extends ExceptionHandler
     }
 
 
-    public function render($request, Throwable $e): JsonResponse|Response
+
+    public function render($request, Throwable $e): JsonResponse|Response|RedirectResponse
     {
         if ($e instanceof AuthorizationException) {
             return response()->json([

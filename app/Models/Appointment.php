@@ -32,4 +32,14 @@ class Appointment extends Model
         return $this->hasMany(ReminderDispatch::class);
     }
 
+    public function scopeOfStatus($query, array|string $status)
+    {
+        if (is_array($status)) {
+            return $query->whereIn('status', $status);
+        }
+
+        return $query->where('status', $status);
+    }
+
+
 }

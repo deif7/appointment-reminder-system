@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\ClientController;
+use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -28,4 +29,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('clients', ClientController::class);
 
+    Route::post('/appointments', [AppointmentController::class, 'store'])->name('api.appointments.store');
+
+    Route::get('appointments/upcoming', [AppointmentController::class, 'upcoming'])->name('api.appointments.upcoming');
+    Route::get('appointments/past', [AppointmentController::class, 'past'])->name('api.appointments.past');
+
 });
+
+
+
