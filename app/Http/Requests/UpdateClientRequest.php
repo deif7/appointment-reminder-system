@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Requests\Auth;
+namespace App\Http\Requests;
 
 use App\Traits\HandlesFailedValidationTrait;
 use Illuminate\Foundation\Http\FormRequest;
 
-class LoginRequest extends FormRequest
+class UpdateClientRequest extends FormRequest
 {
     use HandlesFailedValidationTrait;
 
@@ -17,9 +17,9 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'email'],
-            'password' => ['required'],
+            'name' => ['required', 'string'],
+            'email' => ['required', 'email', 'unique:clients,email,' . $this->client->id],
+            'phone' => ['nullable', 'string'],
         ];
     }
 }
-
