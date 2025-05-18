@@ -38,6 +38,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/reminders/scheduled', [ReminderController::class, 'scheduled'])->name('api.reminders.scheduled');
     Route::get('/reminders/sent', [ReminderController::class, 'sent'])->name('api.reminders.sent');
+
+    Route::get('/reminders/{reminder}/toggle-channel', [ReminderController::class, 'toggleChannel'])
+        ->name('api.reminders.toggle-channel');
 });
 
 
