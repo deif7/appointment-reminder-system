@@ -10,17 +10,28 @@ use App\Models\Client;
 use App\Models\ReminderDispatch;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+use Throwable;
+
 
 class AppointmentService
 {
     private Appointment $appointment;
 
+
+    /**
+     * @throws Throwable
+     */
     public function store(array $data): self
     {
-        $startTimeUtc = Carbon::parse($data['start_time'], Client::findOrFail($data['client_id'])->timezone)->utc();
+        DB::beginTransaction();
 
-        $this->appointment =
-            Appointment::create([
+        try {
+            $client = Client::findOrFail($data['client_id']);
+
+            $startTimeUtc = Carbon::parse($data['start_time'], $client->timezone)->utc();
+
+            $this->appointment = Appointment::create([
                 'user_id' => auth()->id(),
                 'client_id' => $data['client_id'],
                 'title' => $data['title'],
@@ -28,6 +39,12 @@ class AppointmentService
                 'start_time' => $startTimeUtc,
                 'status' => AppointmentStatusEnum::Scheduled,
             ]);
+
+            DB::commit();
+        } catch (Throwable $e) {
+            DB::rollBack();
+            throw $e;
+        }
 
         return $this;
     }

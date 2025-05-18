@@ -20,8 +20,8 @@ class StoreClientRequest extends FormRequest
             'email' => ['required', 'email', 'unique:clients,email'],
             'phone' => ['required', 'string'],
             'timezone' => ['sometimes', 'string'],
-            'prefers_email' => ['nullable', 'string'],
-            'prefers_sms' => ['nullable', 'string'],
+            'prefers_email' => ['nullable', 'bool'],
+            'prefers_sms' => ['nullable', 'bool'],
         ];
     }
 }

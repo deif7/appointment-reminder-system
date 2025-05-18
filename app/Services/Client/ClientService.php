@@ -4,6 +4,8 @@ namespace App\Services\Client;
 
 use App\Models\Client;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class ClientService
 {
@@ -14,50 +16,74 @@ class ClientService
         return Auth::user()->clients()->latest()->get();
     }
 
+    /**
+     * @throws Throwable
+     */
     public function store(array $data): self
     {
-        $this->client = Auth::user()->clients()->create($data);
-        return $this;
-    }
+        DB::beginTransaction();
 
+        try {
+            $this->client = Auth::user()->clients()->create($data);
+            DB::commit();
 
-    public function update(array $data): self
-    {
-        // Toggle on email/sms on update
-        if (isset($data['prefers_email']) && $data['prefers_email']) {
-            $data['prefers_sms'] = false;
+            return $this;
+        } catch (Throwable $e) {
+            DB::rollBack();
+            throw $e;
         }
-        if (isset($data['prefers_sms']) && $data['prefers_sms']) {
-            $data['prefers_email'] = false;
-        }
-
-        $this->client->update($data);
-
-        return $this;
-
-    }
-
-    public function destroy(Client $client): self
-    {
-        $client->delete();
-
-        return $this;
     }
 
     /**
-     * @param $client
-     * @return mixed
+     * @throws Throwable
      */
+    public function update(array $data): self
+    {
+        DB::beginTransaction();
+
+        try {
+            // Toggle on email/sms on update
+            if (isset($data['prefers_email']) && $data['prefers_email']) {
+                $data['prefers_sms'] = false;
+            }
+            if (isset($data['prefers_sms']) && $data['prefers_sms']) {
+                $data['prefers_email'] = false;
+            }
+
+            $this->client->update($data);
+            DB::commit();
+
+            return $this;
+        } catch (Throwable $e) {
+            DB::rollBack();
+            throw $e;
+        }
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function destroy(Client $client): self
+    {
+        DB::beginTransaction();
+
+        try {
+            $client->delete();
+            DB::commit();
+
+            return $this;
+        } catch (Throwable $e) {
+            DB::rollBack();
+            throw $e;
+        }
+    }
+
     public function setClient($client): self
     {
         $this->client = $client;
-
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getClient(): Client
     {
         return $this->client;
