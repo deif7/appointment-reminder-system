@@ -32,11 +32,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/appointments', [AppointmentController::class, 'store'])->name('api.appointments.store');
 
-    Route::get('appointments/upcoming', [AppointmentController::class, 'upcoming'])->name('api.appointments.upcoming');
-    Route::get('appointments/past', [AppointmentController::class, 'past'])->name('api.appointments.past');
+    Route::get('/appointments/upcoming', [AppointmentController::class, 'upcoming'])->name('api.appointments.upcoming');
+    Route::get('/appointments/past', [AppointmentController::class, 'past'])->name('api.appointments.past');
 
-    // Todo View scheduled and past reminders
 
+    Route::get('/reminders/scheduled', [ReminderController::class, 'scheduled'])->name('api.reminders.scheduled');
+    Route::get('/reminders/sent', [ReminderController::class, 'sent'])->name('api.reminders.sent');
 });
 
 

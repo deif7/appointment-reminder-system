@@ -58,7 +58,7 @@ class AppointmentService
         ReminderDispatch::create([
             'appointment_id' => $this->appointment->id,
             'scheduled_for' => $this->appointment->start_time->subMinutes(config('reminders.offset_minutes')),
-            'status' => ReminderStatusEnum::Pending
+            'status' => ReminderStatusEnum::Scheduled
         ]);
 
         return $this;

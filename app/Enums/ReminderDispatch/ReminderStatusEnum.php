@@ -4,7 +4,7 @@ namespace App\Enums\ReminderDispatch;
 
 enum ReminderStatusEnum: string
 {
-    case Pending = 'pending';
+    case Scheduled = 'scheduled';
     case Sent = 'sent';
     case Failed = 'failed';
 }
