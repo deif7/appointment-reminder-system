@@ -3,6 +3,7 @@
 namespace App\Services\Appointment;
 
 use App\Enums\Appointment\AppointmentStatusEnum;
+use App\Enums\ReminderDispatch\ReminderChannelEnum;
 use App\Enums\ReminderDispatch\ReminderStatusEnum;
 use App\Models\Appointment;
 use App\Models\Client;
@@ -58,7 +59,10 @@ class AppointmentService
         ReminderDispatch::create([
             'appointment_id' => $this->appointment->id,
             'scheduled_for' => $this->appointment->start_time->subMinutes(config('reminders.offset_minutes')),
-            'status' => ReminderStatusEnum::Scheduled
+            'status' => ReminderStatusEnum::Scheduled,
+            'channel' => $this->appointment->client?->prefers_sms
+                ? ReminderChannelEnum::Sms->value
+                : ReminderChannelEnum::Email->value,
         ]);
 
         return $this;

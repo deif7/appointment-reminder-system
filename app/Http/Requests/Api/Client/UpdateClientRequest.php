@@ -11,15 +11,17 @@ class UpdateClientRequest extends FormRequest
 
     public function authorize(): bool
     {
-        return true;
+        return auth()->check();
     }
 
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string'],
-            'email' => ['required', 'email', 'unique:clients,email,' . $this->client->id],
-            'phone' => ['nullable', 'string'],
+            'name' => ['sometimes', 'string'],
+            'email' => ['some', 'email', 'unique:clients,email,' . $this->client->id],
+            'phone' => ['sometimes', 'string'],
+            'prefers_sms' => ['sometimes', 'bool'],
+            'prefers_email' => ['sometimes', 'bool']
         ];
     }
 }

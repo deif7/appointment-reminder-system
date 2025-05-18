@@ -33,21 +33,24 @@ class ClientController extends Controller
     public function store(StoreClientRequest $request)
     {
         $user = auth()->user();
-        $client = $this->service->store($request->validated());
+
+        $this->service->store($request->validated());
 
         return response()->json([
             'message' => "Client created successfully for {$user->name}.",
-            'data' => $client,
+            'data' => $this->service->getClient(),
         ], 201);
     }
 
     public function update(UpdateClientRequest $request, Client $client)
     {
-        $updatedClient = $this->service->update($client, $request->validated());
+        $this->service
+            ->setClient($client)
+            ->update($request->validated());
 
         return response()->json([
             'message' => "Client updated successfully.",
-            'data' => $updatedClient,
+            'data' => $this->service->getClient(),
         ], 200);
     }
 

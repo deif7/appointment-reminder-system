@@ -7,25 +7,59 @@ use Illuminate\Support\Facades\Auth;
 
 class ClientService
 {
+    private Client $client;
+
     public function index()
     {
         return Auth::user()->clients()->latest()->get();
     }
 
-    public function store(array $data): Client
+    public function store(array $data): self
     {
-        return Auth::user()->clients()->create($data);
+        $this->client = Auth::user()->clients()->create($data);
+        return $this;
     }
 
 
-    public function update(Client $client, array $data): Client
+    public function update(array $data): self
     {
-        $client->update($data);
-        return $client;
+        // Toggle on email/sms on update
+        if (isset($data['prefers_email']) && $data['prefers_email']) {
+            $data['prefers_sms'] = false;
+        }
+        if (isset($data['prefers_sms']) && $data['prefers_sms']) {
+            $data['prefers_email'] = false;
+        }
+
+        $this->client->update($data);
+
+        return $this;
+
     }
 
-    public function destroy(Client $client): void
+    public function destroy(Client $client): self
     {
         $client->delete();
+
+        return $this;
+    }
+
+    /**
+     * @param $client
+     * @return mixed
+     */
+    public function setClient($client): self
+    {
+        $this->client = $client;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getClient(): Client
+    {
+        return $this->client;
     }
 }
