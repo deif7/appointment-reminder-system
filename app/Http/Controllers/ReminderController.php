@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\ReminderDispatch\ReminderChannelEnum;
 use App\Enums\ReminderDispatch\ReminderStatusEnum;
+use App\Http\Requests\ReminderChannelToggleRequest;
 use App\Models\ReminderDispatch;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -39,19 +40,12 @@ class ReminderController extends Controller
 
     /**
      * @param ReminderDispatch $reminder
-     * @param Request $request
-     * @return void
+     * @param ReminderChannelToggleRequest $request
+     * @return JsonResponse
      * @throws Throwable
      */
-    public function toggleChannel(ReminderDispatch $reminder, Request $request): JsonResponse
+    public function toggleChannel(ReminderDispatch $reminder, ReminderChannelToggleRequest $request): JsonResponse
     {
-        $request->validate([
-            'channel' => [
-                'required',
-                Rule::in(array_column(ReminderChannelEnum::cases(), 'value')),
-            ],
-        ]);
-
         DB::beginTransaction();
 
         try {
