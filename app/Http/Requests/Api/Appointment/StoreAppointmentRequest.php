@@ -28,9 +28,8 @@ class StoreAppointmentRequest extends FormRequest
         return [
             'client_id' => ['required', 'exists:clients,id'],
             'title' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
+            'description' => ['required', 'string'],
             'start_time' => ['required', 'date'],
-            'timezone' => ['required', 'string', 'timezone'],
         ];
     }
 }

@@ -3,23 +3,32 @@
 namespace App\Services\Appointment;
 
 use App\Enums\Appointment\AppointmentStatusEnum;
+use App\Enums\ReminderDispatch\ReminderStatusEnum;
 use App\Models\Appointment;
+use App\Models\Client;
+use App\Models\ReminderDispatch;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
 class AppointmentService
 {
-    public function store(array $data, int $userId): Appointment
+    private Appointment $appointment;
+
+    public function store(array $data): self
     {
-        return Appointment::create([
-            'user_id' => $userId,
-            'client_id' => $data['client_id'],
-            'title' => $data['title'],
-            'description' => $data['description'] ?? null,
-            'start_time' => $data['start_time'],
-            'timezone' => $data['timezone'],
-            'status' => AppointmentStatusEnum::Scheduled,
-        ]);
+        $startTimeUtc = Carbon::parse($data['start_time'], Client::findOrFail($data['client_id'])->timezone)->utc();
+
+        $this->appointment =
+            Appointment::create([
+                'user_id' => auth()->id(),
+                'client_id' => $data['client_id'],
+                'title' => $data['title'],
+                'description' => $data['description'],
+                'start_time' => $startTimeUtc,
+                'status' => AppointmentStatusEnum::Scheduled,
+            ]);
+
+        return $this;
     }
 
     public function getUpcomingAppointments($user): array|Collection
@@ -43,5 +52,22 @@ class AppointmentService
             ->orderBy('start_time', 'desc')
             ->get();
     }
+
+    public function scheduleReminder(): self
+    {
+        ReminderDispatch::create([
+            'appointment_id' => $this->appointment->id,
+            'scheduled_for' => $this->appointment->start_time->subMinutes(config('reminders.offset_minutes')),
+            'status' => ReminderStatusEnum::Pending
+        ]);
+
+        return $this;
+    }
+
+    public function getAppointment(): Appointment
+    {
+        return $this->appointment;
+    }
+
 
 }
