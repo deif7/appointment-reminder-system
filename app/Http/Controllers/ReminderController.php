@@ -2,40 +2,35 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\ReminderDispatch\ReminderChannelEnum;
 use App\Enums\ReminderDispatch\ReminderStatusEnum;
 use App\Http\Requests\ReminderChannelToggleRequest;
+use App\Http\Resources\ReminderDispatchResource;
 use App\Models\ReminderDispatch;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
 use Throwable;
 
 class ReminderController extends Controller
 {
     /**
-     * @return JsonResponse
+     * @return AnonymousResourceCollection
      */
-    public function scheduled()
+    public function scheduled(): AnonymousResourceCollection
     {
-        return response()->json(
-            ReminderDispatch::whereStatus(ReminderStatusEnum::Scheduled->value)
-                ->whereNull('sent_at')
-                ->get()
-        );
+        return ReminderDispatchResource::collection(ReminderDispatch::whereStatus(ReminderStatusEnum::Scheduled->value)
+            ->whereNull('sent_at')
+            ->get());
     }
 
     /**
-     * @return JsonResponse
+     * @return AnonymousResourceCollection
      */
-    public function sent()
+    public function sent(): AnonymousResourceCollection
     {
-        return response()->json(
-            ReminderDispatch::whereStatus(ReminderStatusEnum::Sent->value)
-                ->whereNotNull('sent_at')
-                ->get()
-        );
+        return ReminderDispatchResource::collection(ReminderDispatch::whereStatus(ReminderStatusEnum::Sent->value)
+            ->whereNotNull('sent_at')
+            ->get());
     }
 
     /**

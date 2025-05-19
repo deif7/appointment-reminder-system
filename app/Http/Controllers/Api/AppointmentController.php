@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Appointment\StoreAppointmentRequest;
+use App\Http\Resources\AppointmentResource;
 use App\Services\Appointment\AppointmentService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Throwable;
 
 class AppointmentController extends Controller
@@ -33,13 +35,13 @@ class AppointmentController extends Controller
         }
     }
 
-    public function upcoming(): JsonResponse
+    public function upcoming(): AnonymousResourceCollection|JsonResponse
     {
         try {
             $user = auth()->user();
             $appointments = $this->service->getUpcomingAppointments($user);
 
-            return response()->json($appointments);
+            return AppointmentResource::collection($appointments);
 
         } catch (Throwable $e) {
             return response()->json([
@@ -49,13 +51,13 @@ class AppointmentController extends Controller
         }
     }
 
-    public function past(): JsonResponse
+    public function past(): AnonymousResourceCollection|JsonResponse
     {
         try {
             $user = auth()->user();
             $appointments = $this->service->getPastAppointments($user);
 
-            return response()->json($appointments);
+            return AppointmentResource::collection($appointments);
 
         } catch (Throwable $e) {
             return response()->json([
