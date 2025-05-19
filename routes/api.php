@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Api\AppointmentController;
 use App\Http\Controllers\Api\ClientController;
 use App\Http\Controllers\AuthController;
@@ -28,6 +29,8 @@ Route::post('/login', [AuthController::class, 'login'])->name('api.login');
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('api.logout');
 
+    Route::post('/users/{user}/admin-toggle', [AuthController::class, 'toggleAdmin'])->name('api.users.toggle-admin');
+
     Route::apiResource('clients', ClientController::class);
 
     Route::post('/appointments', [AppointmentController::class, 'store'])->name('api.appointments.store');
@@ -41,6 +44,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/reminders/{reminder}/toggle-channel', [ReminderController::class, 'toggleChannel'])
         ->name('api.reminders.toggle-channel');
+});
+
+// Admin routes
+Route::middleware(['auth:sanctum', 'can:access-admin-panel'])->group(function () {
+    Route::get('/admin/reminders', [AdminController::class, 'allReminders'])->name('api.admin.reminders');
+    Route::get('/admin/appointments/stats', [AdminController::class, 'appointmentStats'])->name('api.admin.appointments.stats');
 });
 
 

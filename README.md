@@ -56,7 +56,14 @@ Using the restful api app
       - get /reminders/sent - view sent reminders
       - post /reminders/{reminder}/toggle-channel - toggle channle with request body (channel - sms, email ) 
       
-   10. Post request to /logout
+   10. Admin API routes 
+    If the auth user is_admin. If not post request /users/{user}/admin-toggle to toggle users is_admin boolean flag.
+    Otherwhise won't be able to perform the admin actions protected by Gate in AuthServiceProvider
+      - post /admin/reminders - see all reminders
+      - post /admin/appointments/stats - see all appointment stats
+      
+     
+   11. Post request to /logout to logout
       
       
    

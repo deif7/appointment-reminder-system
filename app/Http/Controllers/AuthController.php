@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -48,5 +49,24 @@ class AuthController extends Controller
         $request->user()->currentAccessToken()->delete();
 
         return response()->json(['message' => 'Logged out successfully']);
+    }
+
+    /**
+     * Toggles the admin status of a user.
+     *
+     * @param User $user
+     * @return JsonResponse
+     */
+    public function toggleAdmin(User $user)
+    {
+        $user->update([
+            'is_admin' => !$user->is_admin,
+        ]);
+
+        return response()->json([
+            'message' => 'Admin status updated successfully.',
+            'user' => $user->fresh(),
+        ]);
+
     }
 }
