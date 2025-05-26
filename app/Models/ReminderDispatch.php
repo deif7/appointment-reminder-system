@@ -22,4 +22,20 @@ class ReminderDispatch extends Model
         return $this->belongsTo(Appointment::class);
     }
 
+    public static function countUpcoming(): int
+    {
+        return self::where('status', ReminderStatusEnum::Scheduled->value)->count();
+    }
+
+    public static function countSent(): int
+    {
+        return self::where('status', ReminderStatusEnum::Sent->value)->count();
+    }
+
+    public static function countFailed(): int
+    {
+        return self::where('status', ReminderStatusEnum::Failed->value)->count();
+    }
+
+
 }

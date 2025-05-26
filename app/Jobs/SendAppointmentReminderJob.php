@@ -13,6 +13,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use App\Models\ReminderDispatch;
+use Throwable;
 
 class SendAppointmentReminderJob implements ShouldQueue
 {
@@ -37,20 +38,28 @@ class SendAppointmentReminderJob implements ShouldQueue
 
     protected function sendReminder(ReminderDispatch $reminder): void
     {
-        $appointment = $reminder->appointment;
+        try {
+            $appointment = $reminder->appointment;
+            $client = $appointment->client;
 
-        $client = $appointment->client;
+            $reminder->channel === ReminderChannelEnum::Sms
+                ? $this->logSmsMock($client, $appointment)
+                : $client->notify(new AppointmentReminderNotification($appointment));
 
-        $reminder->channel === ReminderChannelEnum::Sms
-            ? $this->logSmsMock($client, $appointment)
-            : $client->notify(new AppointmentReminderNotification($appointment));
+            $reminder->update([
+                'status' => ReminderStatusEnum::Sent->value,
+                'sent_at' => now(),
+            ]);
 
-        $reminder->update([
-            'status' => ReminderStatusEnum::Sent->value,
-            'sent_at' => now(),
-        ]);
+            Log::info("Reminder sent for Appointment #{$appointment->id} to Client {$client->name}");
+        } catch (Throwable $e) {
+            $reminder->update([
+                'status' => ReminderStatusEnum::Failed->value,
+                'error_message' => $e->getMessage(),
+            ]);
 
-        Log::info("Reminder sent for Appointment #{$appointment->id} to Client {$client->name}");
+            Log::error("Failed to send reminder #{$reminder->id}: {$e->getMessage()}");
+        }
     }
 
     private function logSmsMock($client, $appointment): void

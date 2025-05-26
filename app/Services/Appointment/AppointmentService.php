@@ -164,4 +164,20 @@ class AppointmentService
             ->orderBy('start_time', 'desc')
             ->get();
     }
+
+    public function updateStatus(string $status): static
+    {
+        $this->appointment->update([
+            'status' => $status,
+        ]);
+
+        return $this;
+    }
+
+    public function setAppointment(Appointment $appointment): static
+    {
+        $this->appointment = $appointment;
+        return $this;
+    }
+
 }

@@ -33,17 +33,26 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('clients', ClientController::class);
 
+    // Appointments
     Route::post('/appointments', [AppointmentController::class, 'store'])->name('api.appointments.store');
 
     Route::get('/appointments/upcoming', [AppointmentController::class, 'upcoming'])->name('api.appointments.upcoming');
     Route::get('/appointments/past', [AppointmentController::class, 'past'])->name('api.appointments.past');
 
+    Route::patch('/appointments/{appointment}/status', [AppointmentController::class, 'updateStatus'])
+        ->name('api.appointments.update-status');
 
+    // Reminders
     Route::get('/reminders/scheduled', [ReminderController::class, 'scheduled'])->name('api.reminders.scheduled');
     Route::get('/reminders/sent', [ReminderController::class, 'sent'])->name('api.reminders.sent');
 
     Route::post('/reminders/{reminder}/toggle-channel', [ReminderController::class, 'toggleChannel'])
         ->name('api.reminders.toggle-channel');
+
+    Route::get('/reminders/analytics', [ReminderController::class, 'analytics'])
+        ->middleware('auth:sanctum')
+        ->name('api.reminders.analytics');
+
 });
 
 // Admin routes

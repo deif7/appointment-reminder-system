@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Appointment\StoreAppointmentRequest;
+use App\Http\Requests\AppointmentStatusUpdateRequest;
 use App\Http\Resources\AppointmentResource;
+use App\Models\Appointment;
 use App\Services\Appointment\AppointmentService;
 use DB;
 use Illuminate\Http\JsonResponse;
@@ -73,4 +75,18 @@ class AppointmentController extends Controller
             ], 500);
         }
     }
+
+
+    public function updateStatus(AppointmentStatusUpdateRequest $request, Appointment $appointment)
+    {
+        $this->service
+            ->setAppointment($appointment)
+            ->updateStatus($request->get('status'));;
+
+        return response()->json([
+            'message' => 'Appointment status updated successfully.',
+            'appointment' => $this->service->getAppointment(),
+        ]);
+    }
+
 }

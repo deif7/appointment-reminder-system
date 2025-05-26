@@ -63,4 +63,13 @@ class ReminderController extends Controller
             throw $e;
         }
     }
+
+    public function analytics()
+    {
+        return response()->json([
+            'upcoming' => ReminderDispatch::countUpcoming(),
+            'sent' => ReminderDispatch::countSent(),
+            'failed' => ReminderDispatch::countFailed(),
+        ]);
+    }
 }
