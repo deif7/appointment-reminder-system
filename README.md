@@ -95,6 +95,3 @@ Admin Routes (requires is_admin flag)
 - Reminders are sent every minute, respecting client timezones and configured offsets
 - Failed reminders are retried automatically with exponential backoff and max retry limits
 
----
-
-If you want help with testing, deployment, or extending the system, feel free to ask!
