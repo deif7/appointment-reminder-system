@@ -32,6 +32,12 @@ class Appointment extends Model
         return $this->hasMany(ReminderDispatch::class);
     }
 
+    public function recurrences(): HasMany
+    {
+        return $this->hasMany(RecurrentAppointment::class, 'appointment_id');
+    }
+
+
     public function scopeOfStatus($query, array|string $status)
     {
         if (is_array($status)) {

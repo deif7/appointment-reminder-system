@@ -2,9 +2,11 @@
 
 namespace App\Http\Requests\Api\Appointment;
 
+use App\Enums\Appointment\AppointmentRecurrenceEnum;
 use App\Traits\HandlesFailedValidationTrait;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreAppointmentRequest extends FormRequest
 {
@@ -28,8 +30,18 @@ class StoreAppointmentRequest extends FormRequest
         return [
             'client_id' => ['required', 'exists:clients,id'],
             'title' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string'],
+            'description' => ['nullable', 'string'],
             'start_time' => ['required', 'date'],
+
+            'recurrence' => [
+                'required_with:recurrence_ends_at',
+                Rule::in(array_values(AppointmentRecurrenceEnum::cases()), 'value')
+            ],
+            'recurrence_ends_at' => [
+                'required_with:recurrence',
+                'date',
+                'after_or_equal:start_time',
+            ],
         ];
     }
 }

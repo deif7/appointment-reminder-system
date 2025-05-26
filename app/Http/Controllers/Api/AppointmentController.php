@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Appointment\StoreAppointmentRequest;
 use App\Http\Resources\AppointmentResource;
 use App\Services\Appointment\AppointmentService;
+use DB;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Throwable;
@@ -16,21 +17,27 @@ class AppointmentController extends Controller
     {
     }
 
+    /**
+     * @throws Throwable
+     */
     public function store(StoreAppointmentRequest $request): JsonResponse
     {
+        DB::beginTransaction();
         try {
             $this->service
                 ->store($request->validated())
-                ->scheduleReminder();
+                ->scheduleReminders();
+            DB::commit();
 
             return response()->json([
                 'message' => 'Appointment created successfully for your client.',
-                'appointment' => $this->service->getAppointment()
+                'appointment' => $this->service->getAppointment()->load('recurrences'),
             ], 201);
         } catch (Throwable $e) {
+            DB::rollBack();
             return response()->json([
                 'message' => 'Failed to create appointment.',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }

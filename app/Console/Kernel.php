@@ -13,9 +13,9 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
-
         $schedule->job(new SendAppointmentReminderJob())->everyMinute();
+
+        $schedule->command('appointments:generate-recurring')->dailyAt('03:00');
 
     }
 

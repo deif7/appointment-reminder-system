@@ -1,5 +1,9 @@
 <?php
 
 return [
-    'offset_minutes' => env('REMINDER_OFFSET_MINUTES', 30),
+    'offsets' =>
+        [
+            'offset_minutes' => 30,
+            'offset_hours' => 60,
+        ]
 ];
