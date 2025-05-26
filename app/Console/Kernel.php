@@ -17,6 +17,9 @@ class Kernel extends ConsoleKernel
 
         $schedule->command('appointments:generate-recurring')->dailyAt('03:00');
 
+        $schedule->command('reminders:retry-failed')->everyTenMinutes();
+
+
     }
 
     /**

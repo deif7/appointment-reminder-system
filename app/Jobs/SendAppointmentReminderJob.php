@@ -46,19 +46,33 @@ class SendAppointmentReminderJob implements ShouldQueue
                 ? $this->logSmsMock($client, $appointment)
                 : $client->notify(new AppointmentReminderNotification($appointment));
 
+            // Reset retry info on successful send
             $reminder->update([
                 'status' => ReminderStatusEnum::Sent->value,
                 'sent_at' => now(),
+                'retry_count' => 0,
+                'last_retry_at' => null,
+                'error_message' => null,
             ]);
 
             Log::info("Reminder sent for Appointment #{$appointment->id} to Client {$client->name}");
         } catch (Throwable $e) {
-            $reminder->update([
-                'status' => ReminderStatusEnum::Failed->value,
-                'error_message' => $e->getMessage(),
-            ]);
+            $retryCount = $reminder->retry_count + 1;
 
-            Log::error("Failed to send reminder #{$reminder->id}: {$e->getMessage()}");
+            $updateData = [
+                'retry_count' => $retryCount,
+                'last_retry_at' => now(),
+                'error_message' => $e->getMessage(),
+            ];
+
+            if ($retryCount >= config('reminders.max_retries', 3)) {
+                $updateData['status'] = ReminderStatusEnum::Failed->value;
+                Log::error("Reminder #{$reminder->id} failed after max retries ({$retryCount}): {$e->getMessage()}");
+            } else {
+                Log::warning("Reminder #{$reminder->id} failed, will retry (attempt {$retryCount}): {$e->getMessage()}");
+            }
+
+            $reminder->update($updateData);
         }
     }
 
