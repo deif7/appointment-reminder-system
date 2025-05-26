@@ -21,13 +21,17 @@ class SendAppointmentReminderJob implements ShouldQueue
 
     public function handle(): void
     {
+        $now = now();
+
         ReminderDispatch::with(['appointment.client'])
             ->where('status', ReminderStatusEnum::Scheduled->value)
             ->whereNull('sent_at')
-            ->where('scheduled_for', '<=', now())
-            ->get()
-            ->each(fn(ReminderDispatch $reminder) => $this->sendReminder($reminder));
-
+            ->whereBetween('scheduled_for', [$now->copy()->subMinutes(5), $now->copy()->addMinutes(5)])
+            ->chunk(100, function ($reminders) {
+                foreach ($reminders as $reminder) {
+                    $this->sendReminder($reminder);
+                }
+            });
         Log::info('Appointment reminder job completed.');
     }
 
