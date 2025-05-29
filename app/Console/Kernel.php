@@ -13,7 +13,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        $schedule->job(new SendAppointmentReminderJob())->everyMinute();
+        $schedule->job(new SendAppointmentReminderJob())->everyMinute()->withoutOverlapping();
 
         $schedule->command('appointments:generate-recurring')->dailyAt('03:00');
 
