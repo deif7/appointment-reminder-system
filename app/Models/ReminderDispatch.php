@@ -17,6 +17,11 @@ class ReminderDispatch extends Model
         'status' => ReminderStatusEnum::class,
     ];
 
+    protected array $dates = [
+        'sent_at',
+        'scheduled_for'
+    ];
+
     public function appointment(): BelongsTo
     {
         return $this->belongsTo(Appointment::class);
